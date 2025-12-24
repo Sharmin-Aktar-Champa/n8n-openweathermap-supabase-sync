@@ -1,0 +1,337 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0  0  8  *  *  *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        1168,
+        768
+      ],
+      "id": "24938d86-d0a7-4a9c-ba5b-3fc369b2e05e",
+      "name": "Schedule Trigger",
+      "retryOnFail": false,
+      "executeOnce": false,
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "cities",
+              "value": "[\"London\", \"New York\", \"Tokyo\", \"Sydney\"]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1392,
+        768
+      ],
+      "id": "ef2b0df8-e2b3-4fee-94b1-f3848174a047",
+      "name": "Get City"
+    },
+    {
+      "parameters": {
+        "cityName": "={{ $json.cities }}"
+      },
+      "type": "n8n-nodes-base.openWeatherMap",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        768
+      ],
+      "id": "052a729b-b420-41eb-b154-0255c76927a7",
+      "name": "OpenWeatherMap",
+      "credentials": {
+        "openWeatherMapApi": {
+          "id": "xI0JqAAQPvgpzE3a",
+          "name": "OpenWeatherMap account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3ab040c7-f0c1-40af-bfcd-bccdf842be6c",
+              "name": "city",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "f2a67efd-1e39-4652-8d22-307ecdb95b85",
+              "name": "temp",
+              "value": "={{ $json.main.temp }}",
+              "type": "number"
+            },
+            {
+              "id": "77cc7d65-bea5-43f8-bbea-06819732bec7",
+              "name": "description",
+              "value": "={{ $json.weather[0].description }}",
+              "type": "string"
+            },
+            {
+              "id": "de3050d6-5a60-4356-96f9-d066037f5da1",
+              "name": "humidity",
+              "value": "= {{ $json.main.humidity }}",
+              "type": "number"
+            },
+            {
+              "id": "1757b64a-32b6-41c9-9c07-9bb1f8694e8e",
+              "name": "wind",
+              "value": "={{ $json.wind.speed }}",
+              "type": "number"
+            },
+            {
+              "id": "id-6",
+              "name": "feels_like",
+              "value": "={{ $json.main.feels_like }}",
+              "type": "number"
+            },
+            {
+              "id": "id-7",
+              "name": "pressure",
+              "value": "={{ $json.main.pressure }}",
+              "type": "number"
+            },
+            {
+              "id": "id-8",
+              "name": "visibility",
+              "value": "={{ $json.visibility }}",
+              "type": "number"
+            },
+            {
+              "id": "id-9",
+              "name": "wind_deg",
+              "value": "={{ $json.wind.deg }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2064,
+        768
+      ],
+      "id": "05cfd49a-fa70-4c92-a47e-07a577043b53",
+      "name": "Weather API JSON parsing"
+    },
+    {
+      "parameters": {
+        "tableId": "weather_logs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "city",
+              "fieldValue": "={{ $json.city }}"
+            },
+            {
+              "fieldId": "temperature",
+              "fieldValue": "={{ $json.temp }}"
+            },
+            {
+              "fieldId": "condition",
+              "fieldValue": "={{ $json.description }}"
+            },
+            {
+              "fieldId": "humidity",
+              "fieldValue": "={{ $json.humidity }}"
+            },
+            {
+              "fieldId": "wind_speed",
+              "fieldValue": "={{ $json.wind }}"
+            },
+            {
+              "fieldId": "alert_type",
+              "fieldValue": "={{ $json.alertType }}"
+            },
+            {
+              "fieldId": "raw_response",
+              "fieldValue": "={{ JSON.stringify($json) }}"
+            }
+          ]
+        }
+      },
+      "id": "6699d19b-c304-4cef-9690-2ff16fc42a51",
+      "name": "Save to Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2512,
+        768
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "MTyvqygyF8PlYpIp",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "sharmin.champa5439@gmail.com",
+        "toEmail": "sharmin@cs.unc.edu",
+        "subject": "=Daily Weather for {{ $json.city }} - {{ $('Schedule Trigger').first().json['Readable date'] }}",
+        "emailFormat": "text",
+        "text": "={{ $('Determine Alert & Format').item.json.weatherSummary }}",
+        "options": {}
+      },
+      "id": "b9ee7401-f5a2-4a6f-97b2-d9e45069d005",
+      "name": "Send Weather Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        2736,
+        768
+      ],
+      "webhookId": "230b8950-387b-4cbc-aa47-2251f384063b",
+      "credentials": {
+        "smtp": {
+          "id": "Qzk9BG8rBVfHoTgs",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "cities",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "id": "71d047e3-b7f1-45c6-b081-b615c2ee73c1",
+      "name": "Loop Over Cities",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1616,
+        768
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process all weather items\nconst results = [];\n\nfor (const item of $input.all()) {\n  const temp = item.json.temp;\n  const description = item.json.description;\n  \n  // Determine alert type based on conditions\n  let alertType = 'No Alert';\n  \n  if (description.toLowerCase().includes('rain') || \n      description.toLowerCase().includes('drizzle') || \n      description.toLowerCase().includes('storm') || \n      description.toLowerCase().includes('thunder') || \n      description.toLowerCase().includes('snow')) {\n    alertType = '⚠️ Precipitation Alert: Rain/Snow Expected Today';\n  } else if (temp > 32) {\n    alertType = '🔥 Heat Alert: Extremely High Temperature';\n  } else if (temp < 0) {\n    alertType = '❄️ Frost Alert: Freezing Conditions';\n  }\n  \n  // Format weather summary\n  const weatherSummary = `Daily Weather Report for ${item.json.city}\n  \n\nCurrent Conditions:\n- Temperature: ${temp}°C (Feels like: ${item.json.feels_like}°C)\n- Description: ${description}\n- Humidity: ${item.json.humidity}%\n- Wind: ${(item.json.wind * 3.6).toFixed(1)} km/hr at ${item.json.wind_deg}°\n- Pressure: ${item.json.pressure} hPa\n- Visibility: ${(item.json.visibility / 1000).toFixed(1)} km\n\nAlert: ${alertType}`;\n  \n  // Return all fields plus alertType and weatherSummary\n  results.push({\n    json: {\n      ...item.json,\n      weatherSummary,\n      alertType\n    }\n  });\n}\n\nreturn results;"
+      },
+      "id": "2ca627c8-bd9a-4bd8-ac35-921359309a3e",
+      "name": "Determine Alert & Format",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2288,
+        768
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get City",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenWeatherMap": {
+      "main": [
+        [
+          {
+            "node": "Weather API JSON parsing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weather API JSON parsing": {
+      "main": [
+        [
+          {
+            "node": "Determine Alert & Format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Supabase": {
+      "main": [
+        [
+          {
+            "node": "Send Weather Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get City": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Cities",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Cities": {
+      "main": [
+        [
+          {
+            "node": "OpenWeatherMap",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Determine Alert & Format": {
+      "main": [
+        [
+          {
+            "node": "Save to Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "328f9c8d-670e-443f-b93c-fe0213c89eb7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4856279c07e41f29e8ba3045600b4d4466bd0f869e577d60eaf5154b715f86d4"
+  },
+  "id": "guCSjTQgS2bz3Km3",
+  "tags": []
+}
