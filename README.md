@@ -33,9 +33,14 @@ CREATE TABLE weather_logs (
 ```
 
 ### 🔑 n8n Credentials Setup
-To connect to your database, use the **Supabase Node** with the following details:
-*   **Required Fields**: `Host`, `Database name`, `User`, `Password`, and `Port (5432)`.
-*   **Location**: Found under **Project Settings > Database** in your Supabase dashboard.
+To connect via the **Supabase Node (REST API)**, use the following credentials from your Supabase project:
+
+*   **Host (API URL)**: The `URL` found under **Project Settings > Data API**.
+*   **Service Role Key**: The `service_role` (secret) API key found under **Project Settings > API**.
+*   **Setup**: 
+    1. In n8n, create a new **Supabase Credential**.
+    2. Paste the **API URL** into the `Host` field and the **Service Role Key** into the `API Key` field.
+    3. *Note: No port or database password is required for this REST API connection method.*
 
 ---
 
@@ -52,6 +57,17 @@ To connect to your database, use the **Supabase Node** with the following detail
 
 ---
 
+## ✨ Bonus Features Implemented
+
+I have enhanced the workflow with the following features:
+
+-   **Multi-City Processing (Looping)**: Instead of a single city, the workflow now iterates through a fixed list of cities, fetching weather data and generating reports for each one automatically.
+-   **Automated Multi-Channel Reporting**: For every city in the list, the system performing two actions:
+    -   Logging the data into **Supabase** for historical records.
+    -   Sending a customized **Email Alert** for that specific city.
+-   **Additional Weather Metrics**: The summary report and database logs now include extra data points like **Visibility**, **Pressure**, **Wind Direction(in degrees)** and **Feels-like Temperature** for a more comprehensive overview.
+
+
 ## 📥 How to Import and Run
 1.  **Download JSON**: Export your n8n workflow as a `.json` file.
 2.  **Import**: In n8n, click **Workflow Menu (⋮) > Import from File**.
@@ -60,7 +76,6 @@ To connect to your database, use the **Supabase Node** with the following detail
     *   Attach your **Supabase** credentials.
     *   Attach your **SMTP** email credentials.
 4.  **Trigger**:
-    *   **Form Trigger**: Open the form URL, select a city, and submit.
     *   **Schedule Trigger**: Click **Execute Workflow** to test manually.
 
 ---
