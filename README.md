@@ -30,7 +30,7 @@ CREATE TABLE weather_logs (
   alert_type TEXT,
   raw_response JSONB
 );
-
+```
 
 ### 🔑 n8n Credentials Setup
 To connect to your database, use the **Supabase Node** with the following details:
