@@ -65,7 +65,7 @@ I have enhanced the workflow with the following features:
 -   **Automated Multi-Channel Reporting**: For every city in the list, the system performing two actions:
     -   Logging the data into **Supabase** for historical records.
     -   Sending a customized **Email Alert** for that specific city.
--   **Additional Weather Metrics**: The summary report and database logs now include extra data points like **Visibility**, **Pressure**, **Wind Direction(in degrees)** and **Feels-like Temperature** for a more comprehensive overview.
+-   **Additional Weather Metrics**: The summary report now includes extra data points like **Visibility**, **Pressure**, **Wind Direction(in degrees)** and **Feels-like Temperature** for a more comprehensive overview.
 
 
 ## 📥 How to Import and Run
